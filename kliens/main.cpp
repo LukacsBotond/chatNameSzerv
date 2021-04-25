@@ -3,7 +3,7 @@
 #include "../common/Server.h"
 #include "../common/EnValues.h"
 #include "../common/DeValues.h"
-#include "send.hpp"
+#include "./klisend.h"
 
 using namespace std;
 
@@ -25,9 +25,9 @@ void *recv(void *threadarg)
     {
         string rec;
         try{
-        rec = my_data->kliens->Recive(my_data->kliens->getToConnected());
+        rec = my_data->kliens->Recive(my_data->kliens->SockToServ);
         }
-        catch(out_of_range &e){
+        catch(disconected &e){
             cout<<"hiba a recive-ben";
             vege = true;
             pthread_exit(NULL);

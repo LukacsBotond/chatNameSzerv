@@ -1,11 +1,12 @@
-#ifndef send_H
-#define send_H
+#ifndef klisend_H
+#define klisend_H
 
+#include <iostream>
 #include "../common/Server.h"
 
 int getPortFromNameS(Server &kliensToNamereg);
 
 void sendname(Server &kliens);
-bool decodeSend(string userInput);
+bool decodeSend(std::string userInput);
 
 #endif

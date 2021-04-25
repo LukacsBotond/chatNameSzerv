@@ -1,15 +1,15 @@
 CFLAGS = -Wall -lpthread -std=c++17 -g
 
-kliens: ./cliens/*.cpp ./common/*.cpp ./common/*.h
-	g++ -o kliens ./cliens/*.cpp ./common/*.cpp $(CFLAGS)
+kliens: ./kliens/*.cpp ./common/*.cpp ./common/*.h
+	g++ -o ./exec/kli ./kliens/*.cpp ./common/*.cpp $(CFLAGS)
 
-szerver: ./serv/*.cpp ./common/*.cpp ./common/*.h ./serv/servH.h
-	g++ -o szerver ./serv/*.cpp ./common/*.cpp $(CFLAGS)
+szerver: ./serv/*.cpp ./serv/*.cpp ./common/*.cpp ./common/*.h
+	g++ -o ./exec/szerver ./serv/*.cpp ./common/*.cpp $(CFLAGS)
 
 nameServ: ./nameServ/*.cpp ./common/*.cpp ./common/*.h
-	g++ -o nameServ ./nameServ/*.cpp ./common/*.cpp $(CFLAGS)
+	g++ -o ./exec/nameServ ./nameServ/*.cpp ./common/*.cpp $(CFLAGS)
 
-all: kliens szerver
+all: kliens nameServ szerver
 
 clean: 
 	rm -f kliens

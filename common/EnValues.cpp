@@ -9,7 +9,7 @@ string EnValues::getString(string value){
     string ret1=IntToString(value.size()+1)+'s';
     return ret1+value;
 }
-/*
+
 string EnValues::IntToString(int value)
 {
     string ret="";
@@ -23,7 +23,7 @@ string EnValues::IntToString(int value)
     reverse(ret.begin(),ret.end());
     return ret;
 }
-
+/*
 string MyInt::getString(any value){
     int ertek = any_cast<int>(value);
     string ret2= to_string(ertek);

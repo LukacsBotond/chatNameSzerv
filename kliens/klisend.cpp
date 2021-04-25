@@ -1,4 +1,4 @@
-#include "send.hpp"
+#include "klisend.h"
 #include "../common/Server.h"  
 #include "../common/EnValues.h" 
 #include <iostream>
@@ -11,7 +11,7 @@ EnValues enkode;
 int getPortFromNameS(Server &kliensToNamereg){
     string ret = enkode.getString("?");
     kliensToNamereg.Sending(ret);
-    int port = stoi(kliensToNamereg.Recive(kliensToNamereg.getToConnected()));
+    int port = stoi(kliensToNamereg.Recive(kliensToNamereg.SockToServ));
     return port;
 }
 

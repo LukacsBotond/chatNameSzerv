@@ -15,9 +15,13 @@
 #include <arpa/inet.h>
 #include "../common/DeValues.h"
 
+class disconected{
+};
+
 class Server
 {
 public:
+    Server(){}
     Server(int port);
     Server(int kliens, int port);
     ~Server();

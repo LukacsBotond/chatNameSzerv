@@ -31,7 +31,7 @@ Server::Server(int port)
     hint.sin_port = htons(port);
     inet_pton(AF_INET, "0.0.0.0", &hint.sin_addr);
 
-    if ((bind(listening, (sockaddr *)&hint, sizeof(hint))) == -1)
+    if ((bind(listening, (sockaddr *)&hint, sizeof(hint))) <= -1)
     {
         cout << "bind failed\n";
         exit(-1);
@@ -66,8 +66,12 @@ Server::Server(int kliens, int port){
 
 Server::~Server()
 {
+    cout<<"szerver destruktor"<<endl;
     close(this->listening);
     close(this->SockToServ);
+    for (auto const &ksock : this->connetedToMe){
+        close(ksock);
+    }
 }
 
 void Server::accepter(){
@@ -87,19 +91,17 @@ string Server::Recive(int recFrom)
     if(resch == -1){
         return "";
     }
-    if (!resch)
+    if (resCheck(res) == 0)
     {
-        cout << "EXIT RES\n";
-        throw out_of_range("disconnected");
+        throw disconected();
     }
     while (res < hossz)
     {
         vector<char> bufextra(hossz);
         int extra = recv(recFrom, bufextra.data(), hossz - res, 0);
-        if (!resCheck(res))
+        if (resCheck(res) == 0)
         {
-            cout << "EXIT RES\n";
-            throw out_of_range("disconnected");
+            throw disconected();
         }
         for (int i = 0; i < extra; i++)
             buf.at(i + res) = bufextra.at(i);
@@ -113,7 +115,7 @@ string Server::Recive(int recFrom)
 bool Server::Sending(string message)
 {
     int res = send(SockToServ, message.c_str(), message.size(), 0);
-    if (!resCheck(res))
+    if (resCheck(res) == 0)
     {
         return false;
     }
@@ -125,19 +127,17 @@ int Server::ReciveSize(int recFrom)
     vector<char> buf(2);
     int hossz;
     int res = recv(recFrom, buf.data(), 2, 0);
-    if (!resCheck(res))
+    if (resCheck(res) == 0)
     {
-        cout << "EXIT RES\n";
-        throw out_of_range("disconnected");
+        throw disconected();
     }
     while (res < 2)
     {
         vector<char> bufextra(2);
         int extra = recv(recFrom, bufextra.data(), 2 - res, 0);
-        if (!resCheck(res))
+        if (resCheck(res) == 0)
         {
-            cout << "EXIT RES\n";
-            throw out_of_range("disconnected");
+            throw disconected();
         }
         for (int i = 0; i < extra; i++)
             buf.at(i + res) = bufextra.at(i);
