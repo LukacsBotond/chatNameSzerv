@@ -1,17 +1,21 @@
 #include "./nameServer.h"
+#include <random>
 
 using namespace std;
 
 nameServer::nameServer(/* args */)
 {
     NameregToKliens = new Server(54000);
+    checkServers = new Server(54001);
     semafor = new NameSem;
 }
 
 nameServer::~nameServer()
 {
-    delete[]NameregToKliens;
-    delete[]semafor;
+    cout << "nameServ Destruktor" << endl;
+    delete[] NameregToKliens;
+    delete[] checkServers;
+    delete[] semafor;
 }
 
 void nameServer::unblock(int ksock)
@@ -51,24 +55,24 @@ bool nameServer::recive(int ksock)
 
 bool nameServer::send(int ksock)
 {
-    int used;
+    int port;
     while (true)
     {
         semafor->semdown();
         //ha nincs aktiv szerver akkor var, mig lesz
-        if (aktivServer.size() == 0 || aktivServer.top().connetedToMe.size() >= 5)
+        if (aktivServer.size() == 0 || aktivServer.top().aktiveUser >= 5)
         {
             semafor->semup();
             this_thread::sleep_for(chrono::milliseconds(500));
         }
         else
         {
-            used = aktivServer.top().connetedToMe.size();
+            port = aktivServer.top().port;
             semafor->semup();
         }
     }
-    cout << used << endl;
-    string ret = encoder.getString(to_string(used));
+    cout << port << " "<< aktivServer.top().aktiveUser << endl;
+    string ret = encoder.getString(to_string(port));
 
     if (!NameregToKliens->Sending(ret))
     {
@@ -88,4 +92,31 @@ void nameServer::acceptKliens()
 void nameServer::acceptServ()
 {
     checkServers->accepter();
+}
+
+void nameServer::startNewServer()
+{
+    cout << "start new server" << endl;
+    int random;
+    string sys = "./szerver ";
+
+    std::mt19937 rng(56236);
+    std::uniform_int_distribution<int> gen(54100, 54200); // uniform, unbiased
+    random = gen(rng);
+
+    while(true){
+        //talalt egy ures portot
+        if(usedPort.find(random) == usedPort.end()){
+            sys += to_string(random);
+            usedPort.insert(random);
+            break;
+        }
+        if(random >= 54200){
+            random = 54100;
+        }
+        else{
+            random++;
+        }
+    }
+    system(sys.c_str());
 }

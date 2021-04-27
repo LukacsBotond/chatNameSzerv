@@ -11,10 +11,21 @@
 #include <fcntl.h>
 #include <chrono>
 #include <thread>
+#include <set>
 
 using namespace std;
 class nonblock
 {
+};
+
+struct USED{
+    int port;
+    int aktiveUser;
+
+    bool operator<(const USED &other) const
+    {
+        return this->aktiveUser < other.aktiveUser;
+    }
 };
 
 class nameServer
@@ -22,8 +33,7 @@ class nameServer
 private:
     NameSem* semafor;
     DeValues decoder;
-    EnValues encoder;
-    
+    EnValues encoder;    
 public:
     nameServer();
     ~nameServer();
@@ -33,9 +43,15 @@ public:
     bool send(int ksock);
     void acceptKliens();
     void acceptServ();
+
+    void startNewServer();
+
     Server* NameregToKliens;
     Server* checkServers;
-    priority_queue<Server> aktivServer;
+    priority_queue<USED> aktivServer;
+    set<int> usedPort;
 };
+
+inline nameServer* nameServ;
 
 #endif

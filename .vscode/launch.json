@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "g++ - Build and debug active file",
+            "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "$/home/botond/Programok/visual/3 ev/osztottRendszer/chatNameSzerv/exec/nameServ",
-            "args": [],
+            "program": "/home/botond/Programok/visual/3 ev/osztottRendszer/chatNameSzerv/exec/szerver",
+            "args": ["-Wall -lpthread -std=c++17 -g"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -21,9 +21,7 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ],
-            "preLaunchTask": "C/C++: g++ build active file",
-            "miDebuggerPath": "/usr/bin/gdb"
+            ]
         }
     ]
 }

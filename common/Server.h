@@ -34,15 +34,11 @@ public:
     //ahova en vagyok csatlakozva
     int getToConnected();
 
-    bool operator<(const Server &other) const
-    {
-        return this->connetedToMe.size() < other.connetedToMe.size();
-    }
-
     int SockToServ;
     //mindenki aki ram van csatlakozva, csak szerver
     std::list<int> connetedToMe;
     
+    int port;
     int listening;
     int ReciveSize(int recFrom);
     int resCheck(int res);

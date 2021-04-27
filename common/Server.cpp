@@ -6,6 +6,7 @@ using namespace std;
 //szerver mode
 Server::Server(int port)
 {
+    this->port = port;
     // Create a socket
     this->listening = socket(AF_INET, SOCK_STREAM, 0);
     if (listening == -1)
@@ -40,6 +41,7 @@ Server::Server(int port)
 }
 //kliens mode
 Server::Server(int kliens, int port){
+    this->port = port;
     SockToServ = socket(AF_INET, SOCK_STREAM, 0);
     if (SockToServ == -1)
     {
