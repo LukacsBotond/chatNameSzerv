@@ -7,7 +7,7 @@ using namespace std;
 
 struct thread_data
 {
-    nameServer* nameServ;
+    nameServer *nameServ;
 };
 
 //kliensnek kuldi a legkevesbe terhelt szerver portjat
@@ -16,18 +16,30 @@ void *recv(void *threadarg)
     struct thread_data *my_data;
     my_data = (struct thread_data *)threadarg;
     this_thread::sleep_for(chrono::milliseconds(500000));
+    string rec;
     while (true)
     {
         my_data->nameServ->acceptKliens();
-        cout<<"som"<<endl;
+        cout << "som" << endl;
         for (auto const &ksock : my_data->nameServ->NameregToKliens->connetedToMe)
         {
             my_data->nameServ->unblock(ksock);
-            if (!my_data->nameServ->recive(ksock))
+            try
+            {
+                rec = my_data->nameServ->recive(ksock);
+            }
+            catch (disconected &e)
+            {
+            }
+            catch (noData &e)
             {
                 continue;
             }
-            my_data->nameServ->send(ksock);
+            try{
+                my_data->nameServ->send(ksock);
+            }
+            catch(disconected &e){ 
+            }
         }
         //miutan vegignezte az egeszet megall egy keveset
         this_thread::sleep_for(chrono::milliseconds(500));
@@ -37,8 +49,8 @@ void *recv(void *threadarg)
 int main()
 {
     atexit(cleanup);
-    signal(SIGINT, signalHandler); 
-    signal(SIGTERM, signalHandler); 
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
     pthread_t threads[1];
     struct thread_data td[1];
     nameServ = new nameServer;
@@ -55,21 +67,40 @@ int main()
     //hogy mennyire van leterhelve
     srand(time(0));
 
+    string rec;
     while (true)
     {
-        /*
-        if (nameServ->aktivServer.size() == 0 || nameServ->aktivServer.top().aktiveUser >= 4)
+        auto itr = nameServ->aktivServer.begin();
+        USED tmp = *itr;
+        if (nameServ->aktivServer.size() == 0 || tmp.aktiveUser >= 5)
         {
             nameServ->startNewServer();
-            this_thread::sleep_for(chrono::milliseconds(10000));
+            this_thread::sleep_for(chrono::milliseconds(1000));
+            nameServ->acceptServ();
+            cout << "uj szerver elindult" << endl;
         }
-        */
-        //wait till it starts up
-        cout<<"varas a szerverre"<<endl;
-        nameServ->acceptServ();
-        cout<<"uj szerver elindult"<<endl;
-
-        //this_thread::sleep_for(chrono::milliseconds(1000));
+        for (auto Ssock : nameServ->aktivServer)
+        {
+            USED tmp = Ssock;
+            try
+            {
+                rec = nameServ->recive(Ssock.sock);
+            }
+            catch (disconected &e)
+            {
+                nameServ->aktivServer.erase(tmp);
+                nameServ->usedPort.erase(tmp.port);
+            }
+            catch (noData &e){
+                continue;
+            }
+            
+            int used = nameServ->decoder.decInt(rec);
+            cout<<used<<endl;
+            tmp.aktiveUser = used;
+        }
+        nameServ->printAktivServer();
+        this_thread::sleep_for(chrono::milliseconds(500));
     }
 
     return 0;

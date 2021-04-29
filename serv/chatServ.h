@@ -2,14 +2,17 @@
 #ifndef chatServ_H
 #define chatServ_H
 #include "../common/Server.h"
+#include "../common/DeValues.h"
+#include "../common/EnValues.h"
 #include <iostream>
 
 class chatServer
 {
-private:
+public:
+    DeValues decoder;
+    EnValues encoder;
     Server* commChat;
     Server* commNameS;
-public:
     chatServer(int port);
     ~chatServer();
 };

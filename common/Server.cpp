@@ -91,9 +91,9 @@ string Server::Recive(int recFrom)
     int resch = resCheck(res);
     //nem kuldott uzenetet
     if(resch == -1){
-        return "";
+        throw noData();
     }
-    if (resCheck(res) == 0)
+    if (resch == 0)
     {
         throw disconected();
     }
@@ -110,18 +110,16 @@ string Server::Recive(int recFrom)
         res += extra;
     }
     string csomag(buf.begin(), buf.end());
-    //cout << csomag << endl;
     return csomag;
 }
 
-bool Server::Sending(string message)
+void Server::Sending(string message)
 {
     int res = send(SockToServ, message.c_str(), message.size(), 0);
     if (resCheck(res) == 0)
     {
-        return false;
+        throw disconected();
     }
-    return true;
 }
 
 int Server::ReciveSize(int recFrom)

@@ -22,6 +22,7 @@ NameSem::NameSem(/* args */)
 
 NameSem::~NameSem()
 {
+    cout<<"sem destructor"<<endl;
     semctl(semid, 0, IPC_RMID, 0);
 }
 

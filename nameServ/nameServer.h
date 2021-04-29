@@ -21,6 +21,7 @@ class nonblock
 struct USED{
     int port;
     int aktiveUser;
+    int sock;
 
     bool operator<(const USED &other) const
     {
@@ -32,23 +33,28 @@ class nameServer
 {
 private:
     NameSem* semafor;
+public:
     DeValues decoder;
     EnValues encoder;    
-public:
     nameServer();
     ~nameServer();
     void unblock(int ksock);
     //kert-e a socket
-    bool recive(int ksock);
-    bool send(int ksock);
+    string recive(int ksock);
+    void send(int ksock);
     void acceptKliens();
     void acceptServ();
 
     void startNewServer();
 
+    USED findBySocket(int sock);
+    ///////printerek
+
+    void printAktivServer();
+
     Server* NameregToKliens;
     Server* checkServers;
-    priority_queue<USED> aktivServer;
+    std::set<USED> aktivServer;
     set<int> usedPort;
 };
 

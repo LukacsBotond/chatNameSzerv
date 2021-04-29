@@ -18,6 +18,9 @@
 class disconected{
 };
 
+class noData{
+};
+
 class Server
 {
 public:
@@ -26,7 +29,7 @@ public:
     Server(int kliens, int port);
     ~Server();
     std::string Recive(int recFrom);
-    bool Sending(std::string message);
+    void Sending(std::string message);
     void accepter();
     
     std::vector<int> getAllConnected();

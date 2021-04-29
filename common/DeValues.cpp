@@ -7,6 +7,14 @@ DeValues::DeValues(){}
 
 DeValues::~DeValues(){}
 
+string DeValues::decString(string rec){
+    return rec.substr(1);
+}
+
+int DeValues::decInt(string rec){
+    return stoi(rec.substr(1));
+}
+
 /*
 int* DeValues::StringToIntP(string input,int size,int* ret){
     int shift = 0;

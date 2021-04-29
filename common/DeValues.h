@@ -10,6 +10,8 @@ private:
 public:
     DeValues();
     ~DeValues();
+    std::string decString(std::string rec);
+    int decInt(std::string rec);
     /*
     int* StringToIntP(std::string input,int size,int* ret);
     float* StringToFloatP(std::string input,int size,float* ret);

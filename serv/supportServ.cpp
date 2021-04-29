@@ -4,7 +4,7 @@ using namespace std;
 
 void cleanup(void){
     cout<<"cleanup chatServ"<<endl;
-    delete[] chatServ;
+    delete chatServ;
 }
 
 void signalHandler( int signum ) {
