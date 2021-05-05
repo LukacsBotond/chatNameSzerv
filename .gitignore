@@ -1,3 +1,7 @@
 ./exec/*
 ./szerver
 ./kli
+exec/kli
+exec/nameServ
+exec/szerver
+exec/kli
