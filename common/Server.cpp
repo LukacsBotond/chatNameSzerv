@@ -122,6 +122,15 @@ void Server::Sending(string message)
     }
 }
 
+void Server::Sending(string message, int toSock)
+{
+    int res = send(toSock, message.c_str(), message.size(), 0);
+    if (resCheck(res) == 0)
+    {
+        throw disconected();
+    }
+}
+
 int Server::ReciveSize(int recFrom)
 {
     vector<char> buf(2);
@@ -165,4 +174,18 @@ int Server::resCheck(int res)
         return 0;
     }
     return 1;
+}
+
+void Server::unblock(int ksock)
+{
+    if (fcntl(ksock, F_GETFL) & O_NONBLOCK)
+    {
+        cout << "socket is non-blocking" << endl;
+        // Put the socket in non-blocking mode:
+        if (fcntl(ksock, F_SETFL, fcntl(ksock, F_GETFL) | O_NONBLOCK) < 0)
+        {
+            cout << "nem sikerult non-blockingba tenni" << endl;
+            throw nonblock();
+        }
+    }
 }

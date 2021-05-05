@@ -7,38 +7,72 @@
 using namespace std;
 
 //thread for chat
+struct thread_data
+{
+};
 
+void *accept(void *threadarg)
+{
+    cout<<"accept loop starts"<<endl;
+    while (true)
+    {
+        chatServ->commChat->accepter();
+        cout<<"klient connected to chatServer"<<endl;
+    }
+}
+
+void *rec(void *threadarg){
+    string rec;
+    while (true)
+    {
+        for (auto const &ksock :chatServ->commChat->connetedToMe)
+        {
+            chatServ->commChat->unblock(ksock);
+            try
+            {
+                rec = chatServ->commChat->Recive(ksock);
+            }
+            catch (disconected &e)
+            {
+                cout<<"disconnected"<<endl;
+            }
+            catch (noData &e)
+            {
+                //cout<<"nem kuldott semmit"<<endl;
+                continue;
+            }
+            cout<<"uzenet: "<<rec.substr(1)<<endl;
+        }
+        //miutan vegignezte az egeszet megall egy keveset
+        this_thread::sleep_for(chrono::milliseconds(500));
+    }
+}
 
 int main(int argc, char **argv)
 {
     cout<<"server starts"<<endl;
-    int number;
+    int number = getPort(argv);
     atexit(cleanup);
     signal(SIGINT, signalHandler);
     signal(SIGTERM, signalHandler);
-    try
-    {
-        number = std::stoi(argv[1]);
-        cout << number << endl;
-    }
-    catch (std::exception const &e)
-    {
-        cout << "nem szam erkezett" << endl;
-        exit(-1);
-    }
-    if (number < 54100 || number > 54200)
-    {
-        cout << "hibas port erkezett" << endl;
-        exit(-1);
-    }
-    cout<<"here1"<<endl;
+
     chatServ = new chatServer(number);
-    //chatServ->commNameS->Sending(to_string(0));
-    cout<<"here2"<<endl;
+    pthread_t threads[2];
+    struct thread_data td[2];
+    int rc = pthread_create(&threads[0], NULL, accept, (void *)&td[0]);
+    if (rc)
+    {
+        cout << "Error:unable to create thread," << rc << endl;
+        exit(-1);
+    }
+
+
+
     while(true){
-        string sen = chatServ->encoder.getString(to_string(0));
+        int tot = chatServ->getConnectedKlient();
+        string sen = chatServ->encoder.getString(to_string(tot));
         chatServ->commNameS->Sending(sen);
-        this_thread::sleep_for(chrono::milliseconds(10000));
+        this_thread::sleep_for(chrono::milliseconds(1000));
     }
 //thread for communicating with nameserver
 

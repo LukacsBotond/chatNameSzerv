@@ -1,5 +1,5 @@
-#ifndef support_H
-#define support_H
+#ifndef supportName_H
+#define supportName_H
 
 void cleanup(void);
 

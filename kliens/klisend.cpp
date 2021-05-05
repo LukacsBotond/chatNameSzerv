@@ -9,9 +9,11 @@ using namespace std;
 EnValues enkode;
 
 int getPortFromNameS(Server &kliensToNamereg){
+    cout<<"Varas a portra"<<endl;
     string ret = enkode.getString("?");
     kliensToNamereg.Sending(ret);
-    int port = stoi(kliensToNamereg.Recive(kliensToNamereg.SockToServ));
+    ret = kliensToNamereg.Recive(kliensToNamereg.SockToServ).substr(1);
+    int port = stoi(ret);
     return port;
 }
 

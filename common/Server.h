@@ -7,6 +7,8 @@
 #include <cstring>
 #include <map>
 #include <list>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -15,6 +17,9 @@
 #include <arpa/inet.h>
 #include "../common/DeValues.h"
 
+class nonblock
+{
+};
 class disconected{
 };
 
@@ -30,6 +35,7 @@ public:
     ~Server();
     std::string Recive(int recFrom);
     void Sending(std::string message);
+    void Sending(std::string message, int toSock);
     void accepter();
     
     std::vector<int> getAllConnected();
@@ -45,6 +51,7 @@ public:
     int listening;
     int ReciveSize(int recFrom);
     int resCheck(int res);
+    void unblock(int ksock);
     DeValues dekoder;
     sockaddr_in client;
     socklen_t clientSize = sizeof(client);

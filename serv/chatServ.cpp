@@ -16,5 +16,9 @@ chatServer::~chatServer()
     delete commNameS;
 }
 
+int chatServer::getConnectedKlient(){
+    return this->commChat->connetedToMe.size();
+}
+
 
 

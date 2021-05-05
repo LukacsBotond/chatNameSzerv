@@ -9,4 +9,6 @@ int getPortFromNameS(Server &kliensToNamereg);
 void sendname(Server &kliens);
 bool decodeSend(std::string userInput);
 
+inline Server *kliens;
+
 #endif

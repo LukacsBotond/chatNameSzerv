@@ -18,20 +18,6 @@ nameServer::~nameServer()
     delete semafor;
 }
 
-void nameServer::unblock(int ksock)
-{
-    if (fcntl(ksock, F_GETFL) & O_NONBLOCK)
-    {
-        cout << "socket is non-blocking" << endl;
-        // Put the socket in non-blocking mode:
-        if (fcntl(ksock, F_SETFL, fcntl(ksock, F_GETFL) | O_NONBLOCK) < 0)
-        {
-            cout << "nem sikerult non-blockingba tenni" << endl;
-            throw nonblock();
-        }
-    }
-}
-
 string nameServer::recive(int ksock)
 {
     string rec;
@@ -50,18 +36,19 @@ string nameServer::recive(int ksock)
     return rec;
 }
 
-void nameServer::send(int ksock)
+void nameServer::sendPort(int ksock)
 {
     int port;
     while (true)
     {
         semafor->semdown();
         //ha nincs aktiv szerver akkor var, mig lesz
-        auto itr = aktivServer.begin();
+        auto itr =this->aktivServer.begin();
         USED tmp = *itr;
-        if (aktivServer.size() == 0 || tmp.aktiveUser >= 3)
+        if (this->aktivServer.size() == 0 || tmp.aktiveUser >= 6)
         {
             semafor->semup();
+            cout<<"Wait for new server"<<endl;
             this_thread::sleep_for(chrono::milliseconds(500));
         }
         else
@@ -75,7 +62,7 @@ void nameServer::send(int ksock)
 
     try
     {
-        NameregToKliens->Sending(ret);
+        NameregToKliens->Sending(ret,ksock);
     }
     catch (disconected &e)
     {
@@ -95,7 +82,7 @@ void nameServer::acceptServ()
 {
     checkServers->accepter();
     int newServ = checkServers->connetedToMe.back();
-    unblock(newServ);
+    checkServers->unblock(newServ);
     USED tmp;
 
     tmp = findBySocket(-1);
@@ -158,10 +145,8 @@ void nameServer::printAktivServer()
 {
     int lenght = this->aktivServer.size();
     cout << "szerverek szama: " << lenght << endl;
-    for (auto it = aktivServer.begin(); it != aktivServer.end(); ++it)
+    for (auto Ssock : nameServ->aktivServer)
     {
-        USED tmp = *it;
-        cout << tmp.port << " " << tmp.aktiveUser << endl;
-        //cout<<aktivServer.at(i).port<<" "<<aktivServer.at(i).aktiveUser<<endl;
+        cout << Ssock.port << " " << Ssock.aktiveUser << endl;
     }
 }

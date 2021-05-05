@@ -1,7 +1,7 @@
-#ifndef support_H
-#define support_H
+#ifndef supportKli_H
+#define supportKli_H
 
-int getPort(char **argv);
+#include <iostream>
 
 void cleanup(void);
 

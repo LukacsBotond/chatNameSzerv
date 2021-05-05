@@ -4,6 +4,8 @@
 #include "../common/EnValues.h"
 #include "../common/DeValues.h"
 #include "./klisend.h"
+#include <csignal>
+#include "./support.h"
 
 using namespace std;
 
@@ -32,21 +34,25 @@ void *recv(void *threadarg)
             vege = true;
             pthread_exit(NULL);
         }
-        int vecthossz = decoder.Decode255(rec.substr(0, 2));
-        rec = rec.substr(3);
+        rec = rec.substr(1);
         cout << "Recived: " << rec << endl;
     }
 }
 
 int main()
 {
+    cout<<"klines start..."<<endl;
+    atexit(cleanup);
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
     pthread_t threads[1];
     struct thread_data td[1];
     Server *kliensToNamereg = new Server(1, 54000);
     int port = getPortFromNameS(*kliensToNamereg);
-    delete[] kliensToNamereg;
+    delete kliensToNamereg;
 
-    Server *kliens = new Server(1, port);
+    cout<<"connecting to port: "<<port<<endl;
+    kliens = new Server(1, port);
     td[0].port = port;
     td[0].kliens = kliens;
     int rc = pthread_create(&threads[0], NULL, recv, (void *)&td[0]);

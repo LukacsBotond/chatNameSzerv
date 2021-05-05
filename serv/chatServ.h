@@ -15,6 +15,7 @@ public:
     Server* commNameS;
     chatServer(int port);
     ~chatServer();
+    int getConnectedKlient();
 };
 
 inline chatServer* chatServ;

@@ -3,7 +3,7 @@
 
 #include "../common/Server.h"
 #include "../common/EnValues.h"
-#include "./NameSem.h"
+#include "../common/NameSem.h"
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -14,9 +14,6 @@
 #include <set>
 
 using namespace std;
-class nonblock
-{
-};
 
 struct USED{
     int port;
@@ -41,7 +38,7 @@ public:
     void unblock(int ksock);
     //kert-e a socket
     string recive(int ksock);
-    void send(int ksock);
+    void sendPort(int ksock);
     void acceptKliens();
     void acceptServ();
 

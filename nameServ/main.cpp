@@ -1,5 +1,5 @@
 #include "./nameServer.h"
-#include "./NameSem.h"
+#include "../common/NameSem.h"
 #include "./support.h"
 #include <csignal>
 
@@ -7,42 +7,41 @@ using namespace std;
 
 struct thread_data
 {
-    nameServer *nameServ;
 };
 
 //kliensnek kuldi a legkevesbe terhelt szerver portjat
 void *recv(void *threadarg)
 {
-    struct thread_data *my_data;
-    my_data = (struct thread_data *)threadarg;
-    this_thread::sleep_for(chrono::milliseconds(500000));
+    this_thread::sleep_for(chrono::milliseconds(1000));
     string rec;
     while (true)
     {
-        my_data->nameServ->acceptKliens();
-        cout << "som" << endl;
-        for (auto const &ksock : my_data->nameServ->NameregToKliens->connetedToMe)
+        nameServ->acceptKliens();
+        int ksock = nameServ->NameregToKliens->connetedToMe.front();
+        nameServ->NameregToKliens->unblock(ksock);
+        try
         {
-            my_data->nameServ->unblock(ksock);
-            try
-            {
-                rec = my_data->nameServ->recive(ksock);
-            }
-            catch (disconected &e)
-            {
-            }
-            catch (noData &e)
-            {
-                continue;
-            }
-            try{
-                my_data->nameServ->send(ksock);
-            }
-            catch(disconected &e){ 
-            }
+            rec = nameServ->recive(ksock);
         }
-        //miutan vegignezte az egeszet megall egy keveset
-        this_thread::sleep_for(chrono::milliseconds(500));
+        catch (disconected &e)
+        {
+            cout << "disconnected" << endl;
+        }
+        catch (noData &e)
+        {
+            cout << "nem kuldott semmit" << endl;
+            continue;
+        }
+        try
+        {
+            nameServ->sendPort(ksock);
+        }
+        catch (disconected &e)
+        {
+            cout << "disconnected" << endl;
+        }
+        close(ksock);
+        nameServ->NameregToKliens->connetedToMe.pop_front();
     }
 }
 
@@ -54,7 +53,6 @@ int main()
     pthread_t threads[1];
     struct thread_data td[1];
     nameServ = new nameServer;
-    td[0].nameServ = nameServ;
     int rc = pthread_create(&threads[0], NULL, recv, (void *)&td[0]);
     if (rc)
     {
@@ -81,7 +79,7 @@ int main()
         }
         for (auto Ssock : nameServ->aktivServer)
         {
-            USED tmp = Ssock;
+            nameServ->aktivServer.erase(Ssock);
             try
             {
                 rec = nameServ->recive(Ssock.sock);
@@ -91,13 +89,13 @@ int main()
                 nameServ->aktivServer.erase(tmp);
                 nameServ->usedPort.erase(tmp.port);
             }
-            catch (noData &e){
+            catch (noData &e)
+            {
                 continue;
             }
-            
             int used = nameServ->decoder.decInt(rec);
-            cout<<used<<endl;
-            tmp.aktiveUser = used;
+            Ssock.aktiveUser = used;
+            nameServ->aktivServer.insert(Ssock);
         }
         nameServ->printAktivServer();
         this_thread::sleep_for(chrono::milliseconds(500));
