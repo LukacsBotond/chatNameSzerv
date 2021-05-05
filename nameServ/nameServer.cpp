@@ -82,7 +82,7 @@ void nameServer::acceptServ()
 {
     checkServers->accepter();
     int newServ = checkServers->connetedToMe.back();
-    checkServers->unblock(newServ);
+    //checkServers->unblock(newServ);
     USED tmp;
 
     tmp = findBySocket(-1);

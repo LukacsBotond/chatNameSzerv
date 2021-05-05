@@ -40,7 +40,8 @@ Server::Server(int port)
     listen(this->listening, SOMAXCONN);
 }
 //kliens mode
-Server::Server(int kliens, int port){
+Server::Server(int kliens, int port)
+{
     this->port = port;
     SockToServ = socket(AF_INET, SOCK_STREAM, 0);
     if (SockToServ == -1)
@@ -63,21 +64,22 @@ Server::Server(int kliens, int port){
         cout << "connect error" << endl;
         exit(1);
     }
-    
 }
 
 Server::~Server()
 {
-    cout<<"szerver destruktor"<<endl;
+    cout << "szerver destruktor" << endl;
     close(this->listening);
     close(this->SockToServ);
-    for (auto const &ksock : this->connetedToMe){
+    for (auto const &ksock : this->connetedToMe)
+    {
         close(ksock);
     }
 }
 
-void Server::accepter(){
-    cout<<"the server is wating for the klient"<<endl;
+void Server::accepter()
+{
+    cout << "the server is wating for the klient" << endl;
     // Tell Winsock the socket is for listening
     this->connetedToMe.push_back(accept(listening, (sockaddr *)&client, &clientSize));
 }
@@ -90,7 +92,8 @@ string Server::Recive(int recFrom)
     int res = recv(recFrom, buf.data(), hossz, 0);
     int resch = resCheck(res);
     //nem kuldott uzenetet
-    if(resch == -1){
+    if (resch == -1)
+    {
         throw noData();
     }
     if (resch == 0)
@@ -136,7 +139,12 @@ int Server::ReciveSize(int recFrom)
     vector<char> buf(2);
     int hossz;
     int res = recv(recFrom, buf.data(), 2, 0);
-    if (resCheck(res) == 0)
+    int resch = resCheck(res);
+    if (resch == -1)
+    {
+        throw noData();
+    }
+    if (resch == 0)
     {
         throw disconected();
     }
@@ -144,6 +152,10 @@ int Server::ReciveSize(int recFrom)
     {
         vector<char> bufextra(2);
         int extra = recv(recFrom, bufextra.data(), 2 - res, 0);
+        if (resch == -1)
+        {
+            throw noData();
+        }
         if (resCheck(res) == 0)
         {
             throw disconected();
@@ -162,7 +174,8 @@ int Server::resCheck(int res)
 {
     if (res < 0)
     {
-        if(errno == EAGAIN || errno == EWOULDBLOCK){
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+        {
             return -1;
         }
         cout << "RECV error\n";
@@ -178,14 +191,18 @@ int Server::resCheck(int res)
 
 void Server::unblock(int ksock)
 {
-    if (fcntl(ksock, F_GETFL) & O_NONBLOCK)
+    int flags = fcntl(ksock, F_GETFL);
+    if (flags == -1)
     {
-        cout << "socket is non-blocking" << endl;
-        // Put the socket in non-blocking mode:
-        if (fcntl(ksock, F_SETFL, fcntl(ksock, F_GETFL) | O_NONBLOCK) < 0)
-        {
-            cout << "nem sikerult non-blockingba tenni" << endl;
-            throw nonblock();
-        }
+        throw nonblock();
+    }
+    if (fcntl(ksock, F_SETFL, O_NONBLOCK) < 0)
+    {
+        cout << "nem sikerult non-blockingba tenni" << endl;
+        throw nonblock();
+    }
+    else
+    {
+        cout << "unblocked" << endl;
     }
 }

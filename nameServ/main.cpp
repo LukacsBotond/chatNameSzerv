@@ -18,7 +18,6 @@ void *recv(void *threadarg)
     {
         nameServ->acceptKliens();
         int ksock = nameServ->NameregToKliens->connetedToMe.front();
-        nameServ->NameregToKliens->unblock(ksock);
         try
         {
             rec = nameServ->recive(ksock);
