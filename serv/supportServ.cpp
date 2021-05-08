@@ -25,6 +25,7 @@ int getPort(char **argv){
 void cleanup(void){
     cout<<"SZERVER: "<< chatServ->commChat->port <<" "<<"cleanup chatServ"<<endl;
     delete chatServ;
+    pipMy.close();
 }
 
 void signalHandler( int signum ) {

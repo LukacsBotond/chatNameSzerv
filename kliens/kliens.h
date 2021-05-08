@@ -27,7 +27,6 @@ public:
     void sendname();
     std::string rec(bool server);
     void sender(std::string send,bool server);
-    bool decodeSend(std::string userInput);
 };
 
 inline kliens *KLIENS;

@@ -1,4 +1,5 @@
 #include "kliens.h"
+#include <sstream>
 
 using namespace std;
 
@@ -94,3 +95,4 @@ void kliens::sender(std::string send, bool server)
         exit(-1);
     }
 }
+

@@ -1,5 +1,6 @@
 #include "./chatServ.h"
 #include "./supportServ.h"
+#include <fstream>
 #include <csignal>
 #include <chrono>
 #include <thread>
@@ -10,6 +11,24 @@ using namespace std;
 struct thread_data
 {
 };
+
+void *piperead(void *threadarg){
+    string port = to_string(chatServ->commChat->port);
+    pipMy.open("./"+port,ios::in | ios::out);
+    if(pipMy.fail())
+    {
+        cout << "pipe hiba" << endl;
+        exit(-100);
+    }
+    
+    string line;
+    while (true)
+    {
+        getline(pipMy, line);
+        chatServ->decodMsg(line);
+    }
+}
+
 //client connects and send the name, it shouldn't be a duplicate
 //name as the nameServ already checked it
 void *accept(void *threadarg)
@@ -26,7 +45,10 @@ void *accept(void *threadarg)
         {
             rec = chatServ->commChat->Recive(ksock);
             cout<<"SZERVER: "<<" uj felhasznalo: "<< rec.substr(1)<<endl;
-            chatServ->felhasznalok.insert({rec.substr(1), port});
+            USER tmp;
+            tmp.port = port;
+            tmp.sock = ksock;
+            chatServ->felhasznalok.insert({rec.substr(1), tmp});
         }
         catch (disconected &e)
         {
@@ -67,6 +89,7 @@ void *rec(void *threadarg)
             {
                 continue;
             }
+            chatServ->decodMsg(rec.substr(1));
             cout << "SZERVER: " << chatServ->commChat->port << " " << rec.substr(1) << endl;
         }
 
@@ -92,8 +115,8 @@ int main(int argc, char **argv)
     signal(SIGTERM, signalHandler);
 
     chatServ = new chatServer(number);
-    pthread_t threads[2];
-    struct thread_data td[2];
+    pthread_t threads[3];
+    struct thread_data td[3];
     int rc = pthread_create(&threads[0], NULL, accept, (void *)&td[0]);
     if (rc)
     {
@@ -109,13 +132,20 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
+    rc = pthread_create(&threads[0], NULL, piperead, (void *)&td[0]);
+    if (rc)
+    {
+        cout << "SZERVER: " << chatServ->commChat->port << " "
+             << "Error:unable to create thread," << rc << endl;
+        exit(-1);
+    }
+
     while (true)
     {
         int tot = chatServ->getConnectedKlient();
         //send int when sending connected users
         string sen = chatServ->encoder.getString(tot);
-        chatServ->commNameS->Sending(sen);
-        //cout <<"SZERVER: "<< chatServ->commChat->port <<" sender" <<sen<<" |" <<tot<<endl;
+        chatServ->sendToNameS(sen);
         this_thread::sleep_for(chrono::milliseconds(1000));
     }
     //thread for communicating with nameserver
