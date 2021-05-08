@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <vector>
 #include "./kliens.h"
 #include <csignal>
@@ -43,7 +44,7 @@ int main()
     KLIENS = new kliens();
     KLIENS->sendname();
 
-/*
+    /*
     int rc = pthread_create(&threads[0], NULL, recv, (void *)&td[0]);
     if (rc)
     {
@@ -59,13 +60,11 @@ int main()
     do
     { //		Enter lines of text
         cout << "PARANCS>: ";
-        getline (cin, userInput);
+        getline(cin, userInput);
         userInput = KLIENS->encode.getString(userInput);
         try
         {
-            cout<<"sending "<<  userInput <<endl;
-            KLIENS->kliensServ->Sending(userInput);
-            cout<<"done sending"<<endl;
+            KLIENS->kliensServReal->Sending(userInput);
         }
         catch (disconected &e)
         {

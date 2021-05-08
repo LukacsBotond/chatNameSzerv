@@ -25,6 +25,7 @@ void *accept(void *threadarg)
         try
         {
             rec = chatServ->commChat->Recive(ksock);
+            cout<<"SZERVER: "<<" uj felhasznalo: "<< rec.substr(1)<<endl;
             chatServ->felhasznalok.insert({rec.substr(1), port});
         }
         catch (disconected &e)
@@ -53,7 +54,8 @@ void *rec(void *threadarg)
         {
             try
             {
-                cout <<"SZERVER: "<< chatServ->commChat->port <<" "<< "szerver rec:" << endl;
+                //cout << "SZERVER: " << chatServ->commChat->port << " "
+                //     << "szerver rec:" << endl;
                 rec = chatServ->commChat->Recive(ksock);
             }
             catch (disconected &e)

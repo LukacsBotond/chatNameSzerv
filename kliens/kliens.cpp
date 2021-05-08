@@ -14,11 +14,10 @@ kliens::~kliens()
 
 void kliens::connectToServ()
 {
-    delete kliensServ;
-    kliensServ = new Server(1, port);
+    kliensServReal = new Server(1, port);
     //send name to server
-    sender(encode.getString(felhasznalonev));
-    cout<<"sent name to server"<<endl;
+    sender(encode.getString(this->felhasznalonev),true);
+    cout << "sent name to server " << this->felhasznalonev << endl;
 }
 
 void kliens::sendname()
@@ -27,13 +26,14 @@ void kliens::sendname()
     string recive;
     while (true)
     {
-        cout<<"felhasznalonev: ";
-        getline(cin, felhasznalonev);
-        send = encode.getString(felhasznalonev);
+        cout << "felhasznalonev: ";
+        getline(cin, this->felhasznalonev);
+        cout << "felhasznalonev: " << this->felhasznalonev << endl;
+        send = encode.getString(this->felhasznalonev);
         //send
-        sender(send);
+        sender(send,false);
         //recive
-        recive = rec();
+        recive = rec(false);
         //error msg
         if (recive[0] == 's')
         {
@@ -43,6 +43,7 @@ void kliens::sendname()
         else
         {
             port = decode.decInt(recive);
+            cout<<port<<endl;
             connectToServ();
             return;
         }
@@ -51,13 +52,20 @@ void kliens::sendname()
     return;
 }
 
-std::string kliens::rec()
+std::string kliens::rec(bool server)
 {
     string rec;
     try
     {
         //nameServer kuldi a valaszt
-        rec = kliensServ->Recive(kliensServ->SockToServ);
+        if (server)
+        {
+            rec = kliensServReal->Recive(kliensServReal->SockToServ);
+        }
+        else
+        {
+            rec = kliensServ->Recive(kliensServ->SockToServ);
+        }
     }
     catch (disconected &e)
     {
@@ -67,11 +75,18 @@ std::string kliens::rec()
     return rec;
 }
 
-void kliens::sender(std::string send)
+void kliens::sender(std::string send, bool server)
 {
     try
     {
-        kliensServ->Sending(send);
+        if (server)
+        {
+            kliensServReal->Sending(send);
+        }
+        else
+        {
+            kliensServ->Sending(send);
+        }
     }
     catch (disconected &e)
     {
@@ -79,10 +94,3 @@ void kliens::sender(std::string send)
         exit(-1);
     }
 }
-
-
-
-
-
-
-

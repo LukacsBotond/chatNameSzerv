@@ -16,6 +16,7 @@ public:
     EnValues encode;
     std::string felhasznalonev;
     Server *kliensServ;
+    Server *kliensServReal;
     kliens();
     ~kliens();
 
@@ -24,8 +25,8 @@ public:
     //ask new names till it is not in use
     //then recive the port to connect to the server
     void sendname();
-    std::string rec();
-    void sender(std::string send);
+    std::string rec(bool server);
+    void sender(std::string send,bool server);
     bool decodeSend(std::string userInput);
 };
 
