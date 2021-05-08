@@ -12,6 +12,7 @@
 #include <chrono>
 #include <thread>
 #include <set>
+#include <map>
 
 using namespace std;
 
@@ -24,6 +25,16 @@ struct USED{
     {
         return this->aktiveUser < other.aktiveUser;
     }
+
+    bool operator==(const USED &other) const
+    {
+        if(this->aktiveUser == other.aktiveUser && other.sock == this->sock && other.port == this->port)
+        {
+            return true;
+        }
+        return false;
+    }
+
 };
 
 class nameServer
@@ -31,28 +42,34 @@ class nameServer
 private:
     NameSem* semafor;
 public:
+    std::map<std::string,int> felhasznalok;
     DeValues decoder;
-    EnValues encoder;    
+    EnValues encoder; 
+    Server* NameregToKliens;
+    Server* checkServers;
+    std::set<USED> aktivServer;
+    std::set<USED> aktivServerold;
+    set<int> usedPort; 
+
     nameServer();
     ~nameServer();
     void unblock(int ksock);
     //kert-e a socket
     string recive(int ksock);
-    void sendPort(int ksock);
+    void sendPort(int ksock,std::string felhasznalo);
     void acceptKliens();
     void acceptServ();
 
     void startNewServer();
 
     USED findBySocket(int sock);
+    //true ha szabad a nev
+    //false ha nem
+    bool checkName(std::string name);
+
     ///////printerek
 
     void printAktivServer();
-
-    Server* NameregToKliens;
-    Server* checkServers;
-    std::set<USED> aktivServer;
-    set<int> usedPort;
 };
 
 inline nameServer* nameServ;

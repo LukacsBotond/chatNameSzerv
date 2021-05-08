@@ -1,3 +1,4 @@
+/*
 #include "klisend.h"
 #include "../common/Server.h"  
 #include "../common/EnValues.h" 
@@ -38,3 +39,4 @@ bool decodeSend(string userInput){
     }
 
 }
+*/

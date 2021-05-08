@@ -46,6 +46,8 @@ public:
     //tobbi simma karakter
     //alosztaly kell elvegezze
     std::string virtual getString(std::string value);
+    std::string virtual getString(int value);
+    //kodolas
     std::string IntToString(int value);
 };
 /*

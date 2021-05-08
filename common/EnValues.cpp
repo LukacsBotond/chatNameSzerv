@@ -10,6 +10,14 @@ string EnValues::getString(string value){
     return ret1+value;
 }
 
+string EnValues::getString(int value){
+    string ret2 = to_string(value);
+    string ret1=IntToString(ret2.size()+1)+'i';
+    return ret1+ret2;
+}
+
+
+
 string EnValues::IntToString(int value)
 {
     string ret="";

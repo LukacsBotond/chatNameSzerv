@@ -3,12 +3,12 @@
 using namespace std;
 
 void cleanup(void){
-    cout<<"cleanup"<<endl;
+    cout <<"nameSzerv: "<<"cleanup"<<endl;
     delete nameServ;
 }
 
 void signalHandler( int signum ) {
-   cout << "Interrupt signal (" << signum << ") received.\n";
+   cout <<"nameSzerv: " << "Interrupt signal (" << signum << ") received.\n";
    // cleanup and close up stuff here  
    // terminate program  
    exit(signum);  

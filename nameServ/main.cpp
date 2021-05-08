@@ -9,6 +9,18 @@ struct thread_data
 {
 };
 
+void *acc(void *threadarg)
+{
+    cout<<"nameSzerv: " << "accept loop starts" << endl;
+    while (true)
+    {
+        nameServ->NameregToKliens->accepter();
+        int ksock = nameServ->NameregToKliens->connetedToMe.back();
+        nameServ->NameregToKliens->unblock(ksock);
+        cout  <<"nameSzerv: " << "klient connected to NameServ" << endl;
+    }
+}
+
 //kliensnek kuldi a legkevesbe terhelt szerver portjat
 void *recv(void *threadarg)
 {
@@ -16,31 +28,47 @@ void *recv(void *threadarg)
     string rec;
     while (true)
     {
-        nameServ->acceptKliens();
-        int ksock = nameServ->NameregToKliens->connetedToMe.front();
-        try
+        vector<int> torol;
+        for (auto const &ksock : nameServ->NameregToKliens->connetedToMe)
         {
-            rec = nameServ->recive(ksock);
+            try
+            {
+                //string erkezik a nevvel
+                rec = nameServ->recive(ksock);
+                rec = rec.substr(1);
+            }
+            catch (disconected &e)
+            {
+                torol.push_back(ksock);
+                continue;
+            }
+            catch (noData &e)
+            {
+                continue;
+            }
+
+            if(!nameServ->checkName(rec)){
+                rec = nameServ->encoder.getString("foglalt a nev");
+                nameServ->NameregToKliens->Sending(rec);
+                continue;
+            }
+            try
+            {
+                nameServ->sendPort(ksock,rec);
+            }
+            catch (disconected &e)
+            {
+                torol.push_back(ksock);
+            }
         }
-        catch (disconected &e)
-        {
-            cout << "disconnected" << endl;
+
+        for(unsigned int i=0;i<torol.size();i++){
+            cout <<"nameSzerv: " << "disconnected" << endl;
+            close(torol.at(i));
+            nameServ->NameregToKliens->connetedToMe.remove(torol.at(i));
         }
-        catch (noData &e)
-        {
-            cout << "nem kuldott semmit" << endl;
-            continue;
-        }
-        try
-        {
-            nameServ->sendPort(ksock);
-        }
-        catch (disconected &e)
-        {
-            cout << "disconnected" << endl;
-        }
-        close(ksock);
-        nameServ->NameregToKliens->connetedToMe.pop_front();
+
+        this_thread::sleep_for(chrono::milliseconds(1000));
     }
 }
 
@@ -49,13 +77,19 @@ int main()
     atexit(cleanup);
     signal(SIGINT, signalHandler);
     signal(SIGTERM, signalHandler);
-    pthread_t threads[1];
-    struct thread_data td[1];
+    pthread_t threads[2];
+    struct thread_data td[2];
     nameServ = new nameServer;
     int rc = pthread_create(&threads[0], NULL, recv, (void *)&td[0]);
     if (rc)
     {
-        cout << "Error:unable to create thread," << rc << endl;
+        cout <<"nameSzerv: " << "Error:unable to create thread," << rc << endl;
+        exit(-1);
+    }
+    rc = pthread_create(&threads[0], NULL, acc, (void *)&td[0]);
+    if (rc)
+    {
+        cout <<"nameSzerv: " << "Error:unable to create thread," << rc << endl;
         exit(-1);
     }
 
@@ -74,7 +108,7 @@ int main()
             nameServ->startNewServer();
             this_thread::sleep_for(chrono::milliseconds(1000));
             nameServ->acceptServ();
-            cout << "uj szerver elindult" << endl;
+            cout <<"nameSzerv: " << "uj szerver elindult" << endl;
         }
         for (auto Ssock : nameServ->aktivServer)
         {

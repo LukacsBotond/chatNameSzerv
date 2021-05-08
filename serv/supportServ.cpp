@@ -23,12 +23,12 @@ int getPort(char **argv){
 }
 
 void cleanup(void){
-    cout<<"cleanup chatServ"<<endl;
+    cout<<"SZERVER: "<< chatServ->commChat->port <<" "<<"cleanup chatServ"<<endl;
     delete chatServ;
 }
 
 void signalHandler( int signum ) {
-   cout << "Interrupt signal (" << signum << ") received.\n";
+   cout<<"SZERVER: "<< chatServ->commChat->port <<" " << "Interrupt signal (" << signum << ") received.\n";
    // cleanup and close up stuff here  
    // terminate program  
    exit(signum);  

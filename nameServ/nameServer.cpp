@@ -1,5 +1,6 @@
 #include "./nameServer.h"
 #include <random>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -12,7 +13,8 @@ nameServer::nameServer(/* args */)
 
 nameServer::~nameServer()
 {
-    cout << "nameServ Destruktor" << endl;
+    cout << "nameSzerv: "
+         << "nameServ Destruktor" << endl;
     delete NameregToKliens;
     delete checkServers;
     delete semafor;
@@ -27,42 +29,40 @@ string nameServer::recive(int ksock)
     }
     catch (disconected &e)
     {
-        cout << "cliens disconnected" << endl;
-        NameregToKliens->connetedToMe.remove(ksock);
-
-        close(ksock);
         throw disconected();
     }
     return rec;
 }
 
-void nameServer::sendPort(int ksock)
+void nameServer::sendPort(int ksock, string felhasznalo)
 {
     int port;
     while (true)
     {
         semafor->semdown();
         //ha nincs aktiv szerver akkor var, mig lesz
-        auto itr =this->aktivServer.begin();
+        auto itr = this->aktivServer.begin();
         USED tmp = *itr;
         if (this->aktivServer.size() == 0 || tmp.aktiveUser >= 6)
         {
             semafor->semup();
-            cout<<"Wait for new server"<<endl;
+            cout << "nameSzerv: "
+                 << "Wait for new server" << endl;
             this_thread::sleep_for(chrono::milliseconds(500));
         }
         else
         {
             port = tmp.port;
             semafor->semup();
+            felhasznalok.insert({felhasznalo, port});
             break;
         }
     }
-    string ret = encoder.getString(to_string(port));
+    string ret = encoder.getString(port);
 
     try
     {
-        NameregToKliens->Sending(ret,ksock);
+        NameregToKliens->Sending(ret, ksock);
     }
     catch (disconected &e)
     {
@@ -94,7 +94,8 @@ void nameServer::acceptServ()
 
 void nameServer::startNewServer()
 {
-    cout << "start new server" << endl;
+    cout << "nameSzerv: "
+         << "start new server" << endl;
     int random;
     string sys = "./szerver ";
 
@@ -107,13 +108,18 @@ void nameServer::startNewServer()
         //talalt egy ures portot
         if (usedPort.find(random) == usedPort.end())
         {
-            sys += to_string(random) +" &";
+            string pipename = "./";
+            pipename += to_string(random);
+            sys += to_string(random) + " &";
             usedPort.insert(random);
             USED tmp;
             tmp.aktiveUser = 0;
             tmp.port = random;
             tmp.sock = -1;
             aktivServer.insert(tmp);
+            //make a named pipe for the server
+            mkfifo(pipename.c_str(), 0666);
+            //start the server
             system(sys.c_str());
             break;
         }
@@ -141,12 +147,26 @@ USED nameServer::findBySocket(int sock)
     throw noData();
 }
 
+bool nameServer::checkName(string name)
+{
+    if (felhasznalok.find(name) == felhasznalok.end())
+    {
+        return true;
+    }
+    return false;
+}
+
 void nameServer::printAktivServer()
 {
-    int lenght = this->aktivServer.size();
-    cout << "szerverek szama: " << lenght << endl;
-    for (auto Ssock : nameServ->aktivServer)
+    if (aktivServer != aktivServerold)
     {
-        cout << Ssock.port << " " << Ssock.aktiveUser << endl;
+        int lenght = this->aktivServer.size();
+        cout << "nameSzerv: "
+             << "szerverek szama: " << lenght << endl;
+        for (auto Ssock : nameServ->aktivServer)
+        {
+            cout << "nameSzerv: " << Ssock.port << " " << Ssock.aktiveUser << endl;
+        }
     }
+    aktivServerold = aktivServer;
 }

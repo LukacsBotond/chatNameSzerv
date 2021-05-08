@@ -1,3 +1,4 @@
+/*
 #ifndef klisend_H
 #define klisend_H
 
@@ -12,3 +13,4 @@ bool decodeSend(std::string userInput);
 inline Server *kliens;
 
 #endif
+*/

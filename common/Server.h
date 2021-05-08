@@ -34,8 +34,11 @@ public:
     Server(int kliens, int port);
     ~Server();
     std::string Recive(int recFrom);
+    //klient to server, socket is to what I'm connected
     void Sending(std::string message);
+    //server to klient send based on socket
     void Sending(std::string message, int toSock);
+    //accept klients and store the client socket
     void accepter();
     
     std::vector<int> getAllConnected();

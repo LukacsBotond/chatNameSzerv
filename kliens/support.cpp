@@ -1,11 +1,11 @@
 #include "./support.h"
-#include "./klisend.h"
+#include "./kliens.h"
 
 using namespace std;
 
 void cleanup(void){
     cout<<"cleanup"<<endl;
-    delete kliens;
+    delete KLIENS;
 }
 
 void signalHandler( int signum ) {

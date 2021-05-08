@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/home/botond/Programok/visual/3 ev/osztottRendszer/chatNameSzerv/exec/nameServ",
+            "program": "/home/botond/Programok/visual/3 ev/osztottRendszer/chatNameSzerv/exec/kli",
             "args": ["-Wall -lpthread -std=c++17 -g"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
