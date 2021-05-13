@@ -96,8 +96,7 @@ void chatServer::SendPriv(string msg, string comm, string cimzett)
         sendToNameS(sen1);
         rec = recFromNameS();
         port = decoder.decInt(rec);
-        string sen = comm + " " + cimzett + " " + user->first + " " + msg;
-        sen = encoder.getString(sen);
+        string sen = comm + " " + cimzett + " "+ msg;
         sendMsgPipe(sen, port);
     }
     else

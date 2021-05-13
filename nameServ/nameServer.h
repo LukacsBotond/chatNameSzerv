@@ -63,6 +63,8 @@ public:
     void startNewServer();
 
     USED findBySocket(int sock);
+
+    void getPortForUser(std::string cimzett, USED Ssock);
     //true ha szabad a nev
     //false ha nem
     bool checkName(std::string name);

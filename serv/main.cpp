@@ -25,6 +25,7 @@ void *piperead(void *threadarg){
     while (true)
     {
         getline(pipMy, line);
+        cout<<"SZERVER: pipe get: "<<line<<endl;
         chatServ->decodMsg(line);
     }
 }

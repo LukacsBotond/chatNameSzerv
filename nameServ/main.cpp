@@ -127,6 +127,7 @@ int main()
             cout << "nameSzerv: "
                  << "uj szerver elindult" << endl;
         }
+        vector<USED> torol;
         for (auto Ssock : nameServ->aktivServer)
         {
             nameServ->aktivServer.erase(Ssock);
@@ -136,17 +137,40 @@ int main()
             }
             catch (disconected &e)
             {
-                nameServ->aktivServer.erase(tmp);
-                nameServ->usedPort.erase(tmp.port);
+                torol.push_back(Ssock);
             }
             catch (noData &e)
             {
                 continue;
             }
-            int used = nameServ->decoder.decInt(rec);
-            Ssock.aktiveUser = used;
-            nameServ->aktivServer.insert(Ssock);
+            //szerver kuldi, hogy hanyan vannak csatlakozva
+            if (rec[0] == 'i')
+            {
+                int used = nameServ->decoder.decInt(rec);
+                Ssock.aktiveUser = used;
+                nameServ->aktivServer.insert(Ssock);
+            }
+            //szerver keri, hogy a cimzett milyen porton van
+            else
+            {
+                cout<<"sock: "<<Ssock.sock<<endl;
+                cout << "nameSzerv: "
+                     << "port search"<< rec.substr(3) << endl;
+                if (rec[2] == 'p')
+                {
+                    nameServ->getPortForUser(rec.substr(3), Ssock);
+                }
+            }
         }
+        for (unsigned int i = 0; i < torol.size(); i++)
+        {
+            cout << "nameSzerv: "
+                 << "disconnected szerver" << endl;
+            close(torol.at(i).sock);
+            nameServ->aktivServer.erase(torol.at(i));
+            nameServ->usedPort.erase(torol.at(i).port);
+        }
+
         nameServ->printAktivServer();
         this_thread::sleep_for(chrono::milliseconds(500));
     }

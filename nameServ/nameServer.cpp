@@ -170,3 +170,34 @@ void nameServer::printAktivServer()
     }
     aktivServerold = aktivServer;
 }
+
+//////////////////////////////////
+
+void nameServer::getPortForUser(string cimzett, USED Ssock)
+{
+    string rec;
+    auto user = felhasznalok.find(cimzett);
+    //nincs ilyen felhasznalo
+    if (user == felhasznalok.end())
+    {
+        rec = encoder.getString(-1);
+    }
+    else
+    {
+        rec = encoder.getString(user->second);
+    }
+    cout<<"nameSzerv: kikuldendo port: "<<rec<<" "<<rec.substr(3)<<endl;
+    cout<<"sock: "<<Ssock.sock<<endl;
+    try
+    {
+        this->checkServers->Sending(rec, Ssock.sock);
+    }
+    catch (disconected &e)
+    {
+        cout << "nameSzerv: "
+             << "disconnected szerver" << endl;
+        close(Ssock.sock);
+        nameServ->aktivServer.erase(Ssock);
+        nameServ->usedPort.erase(Ssock.port);
+    }
+}
